@@ -1,16 +1,29 @@
-from typing import Any, Callable
+from typing import Callable
 
-def spell1() -> None:
-    return "Fireball hits dragon"
+def fireball(target: str) -> str:
+    return f"Fireball hits {target}"
 
-def spell2() -> None:
-    return "Heals dragon"
+def heal(target: str) -> str:
+    return f"Heals {target}"
 
-def spell_combiner(spell1: Callable, spell2: Callable) -> Callable:
-    return (spell1(), spell2())
+def spell_combiner(spell1: Callable[..., str],
+                   spell2: Callable[..., str]
+                   )-> Callable[..., tuple[str, str]]:
+    def combination(*args: str) -> tuple[str, str]:
+        try:
+            res1: str = spell1(*args)
+            res2: str = spell2(*args)
+            return (res1, res2)
+        except Exception as e:
+            return (f"Error: {e}", f"Error: {e}")
+    return combination
+
+# def power_amplifier(base_spell: Callable, multiplier: int) -> Callable:
 
 
 if __name__ == "__main__":
     print("=============Testing spell combiner=============")
-    combined = spell_combiner(spell1, spell2)
-    print(f"Combined spell result: {combined}")
+    combined: Callable[..., tuple[str, str]] = spell_combiner(fireball, heal)
+    print(f"Combined spell result: {combined('Dragon')}\n")
+
+    print("=============Power amplifier=============")

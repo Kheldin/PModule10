@@ -18,8 +18,8 @@ def spell_combiner(spell1: Callable[..., str],
             return (f"Error: {e}", f"Error: {e}")
     return combination
 
-# def power_amplifier(base_spell: Callable, multiplier: int) -> Callable:
-
+def power_amplifier(base_spell: Callable[int], multiplier: int) -> Callable[int]:
+    return lambda x : x * n
 
 if __name__ == "__main__":
     print("=============Testing spell combiner=============")

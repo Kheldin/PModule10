@@ -50,12 +50,12 @@ def spell_dispatcher() -> Callable[..., Any]:
     def dispatcher(damage: int) -> int:
         return damage
 
-    @dispatcher.register(str)
-    def _1(enchantment: str) -> str:
+    @dispatcher.register(str)  # type: ignore
+    def _1(enchantment: str) -> str:  # type: ignore
         return f"Enchantement: {enchantment}"
 
-    @dispatcher.register(list)
-    def _2(multi_cast: list[Any]) -> list[Any]:
+    @dispatcher.register(list)  # type: ignore
+    def _2(multi_cast: list[Any]) -> list[Any]:  # type: ignore
         return [val for val in multi_cast]
 
     return dispatcher

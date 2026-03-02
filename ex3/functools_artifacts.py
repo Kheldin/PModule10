@@ -54,7 +54,7 @@ def spell_dispatcher() -> Callable[..., Any]:
     def _1(enchantment: str) -> str:
         return f"Enchantement: {enchantment}"
     
-    @dispatcher.register(list[Any])
+    @dispatcher.register(list)
     def _2(multi_cast: list[Any]) -> list[Any]:
         return [val for val in multi_cast]
 

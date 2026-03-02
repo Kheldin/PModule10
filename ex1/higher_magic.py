@@ -1,14 +1,9 @@
 from typing import Callable, Any
 
-def fireball(target: str) -> str:
-    return f"Fireball hits {target}"
 
-def heal(target: str) -> str:
-    return f"Heals {target}"
-
-def spell_combiner(spell1: Callable[..., str],
-                   spell2: Callable[..., str]
-                   )-> Callable[..., tuple[str, str]]:
+def spell_combiner(
+    spell1: Callable[..., str], spell2: Callable[..., str]
+) -> Callable[..., tuple[str, str]]:
     def combination(*args: str) -> tuple[str, str]:
         try:
             res1: str = spell1(*args)
@@ -16,30 +11,44 @@ def spell_combiner(spell1: Callable[..., str],
             return (res1, res2)
         except Exception as e:
             return (f"Error: {e}", f"Error: {e}")
+
     return combination
 
-def power_amplifier(base_spell: Callable[..., int],
-                    multiplier: int
-                    ) -> Callable[..., int]:
+
+def power_amplifier(
+    base_spell: Callable[..., int], multiplier: int
+) -> Callable[..., int]:
     return lambda *args: base_spell(*args) * multiplier
 
-def base_spell() -> int:
-    return 4
 
-def conditional_caster(condition: Callable[..., bool],
-                       spell: Callable[..., Any]
-                       ) -> Callable[..., Any]:
-    return lambda *args: spell(*args) if (condition(*args)) else 'Spell fizzled'
+def conditional_caster(
+    condition: Callable[..., bool], spell: Callable[..., Any]
+) -> Callable[..., Any]:
+    return lambda *args: spell(*args) if (condition(*args))\
+            else "Spell fizzled"
 
-def test_bool_func(target: str) -> bool:
-    return True
 
 def spell_sequence(spells: list[Callable[..., Any]]) -> Callable[..., Any]:
     def casting_spells(*args: str) -> list[Any]:
         return [spell(*args) for spell in spells]
+
     return casting_spells
 
+
 if __name__ == "__main__":
+
+    def test_bool_func(target: str) -> bool:
+        return True
+
+    def base_spell() -> int:
+        return 4
+
+    def fireball(target: str) -> str:
+        return f"Fireball hits {target}"
+
+    def heal(target: str) -> str:
+        return f"Heals {target}"
+
     print("=============Testing spell combiner=============")
     combined: Callable[..., tuple[str, str]] = spell_combiner(fireball, heal)
     print(f"Combined spell result: {combined('Dragon')}\n")

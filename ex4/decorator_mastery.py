@@ -5,15 +5,15 @@ from time import time
 
 def spell_timer(func: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(func)
-    def wrapper():
+    def wrapper(*args: Any, **kwargs: Any):
         print(f"Casting {func.__name__}")
         begin = time()
-        res = func()
+        res = func(*args, **kwargs)
         end = time()
         t = end - begin
         print(f"Spell completed in {t}")
         print("Result:", res)
-        return func()
+        return res
 
     return wrapper
 
@@ -25,10 +25,11 @@ def fireball() -> str:
 
 def power_validator(min_power: int) -> Callable[..., Any]:
     def wrapper(func: Callable[..., Any]) -> str | Callable[..., Any]:
+        @wraps(func)
         def wrapper_bis(*args: Any, **kwargs: Any) -> str | None:
             return (
                 func(*args, **kwargs)
-                if args[2] > min_power
+                if args[2] >= min_power
                 else "Insufficient power for this spell"
             )
 
@@ -38,28 +39,19 @@ def power_validator(min_power: int) -> Callable[..., Any]:
 
 
 def retry_spell(max_attempts: int) -> Callable[..., Any]:
-    nb_tries = 1
-
-    def wrapper(func: Callable[..., Any]):
-        def wrapper_bis(*args: Any, **kwargs: Any) -> None:
-            nonlocal nb_tries
-            save_tries = nb_tries
-            while nb_tries <= max_attempts:
+    def wrapper(func: Callable[..., Any]) -> Callable[..., Any]:
+        @wraps(func)
+        def wrapper_bis(*args: Any, **kwargs: Any) -> Any:
+            for attempt in range(1, max_attempts + 1):
                 try:
-                    func(*args, **kwargs)
+                    return func(*args, **kwargs)
                 except Exception:
                     print(
                         f"Spell failed, retrying... "
-                        f"(attempt {nb_tries}/{max_attempts})"
+                        f"(attempt {attempt}/{max_attempts})"
                     )
-                    nb_tries += 1
-                if nb_tries > max_attempts:
-                    print("Spell casting failed after max_attempts attempts")
-                if nb_tries == save_tries:
-                    break
-
+            return f"Spell casting failed after {max_attempts} attempts"
         return wrapper_bis
-
     return wrapper
 
 
@@ -67,9 +59,7 @@ class MageGuild:
 
     @staticmethod
     def validate_mage_name(name: str) -> bool:
-        if len(name) < 3:
-            return False
-        return True
+        return len(name) >= 3 and all(c.isalpha() or c.isspace() for c in name)
 
     @power_validator(min_power=10)
     def cast_spell(self, spell_name: str, power: int) -> str:
